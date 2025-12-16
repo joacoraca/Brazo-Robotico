@@ -28,8 +28,8 @@
 #define MAX_GARRA 40
 #define MIN_GARRA 0
 
-char ssid[] = "Marcela";
-char pass[] = "santi2007";   
+char ssid[] = "ETRR Free";
+char pass[] = "";   
 
     Servo baseServo;       
     Servo hombroServo;
@@ -82,4 +82,5 @@ BLYNK_WRITE(V3)
     int angle = param.asInt();
     angle = constrain(angle, MIN_GARRA, MAX_GARRA);
     garraServo.write(angle);
+
 }
