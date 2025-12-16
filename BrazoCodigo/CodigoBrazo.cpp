@@ -12,13 +12,13 @@
 #define PIN_CODO 18
 #define PIN_GARRA 4
 
-// Poscion inicial del brazo
+// Posición inicial del brazo
 #define INICIO_B 90
-#define INICIO_H 41
+#define INICIO_H 60
 #define INICIO_C 0
 #define INICIO_G 0
 
-// limites de movimiento de los servos 
+// Límites de movimiento
 #define MAX_BASE 180
 #define MIN_BASE 0
 #define MAX_HOMBRO 100
@@ -29,26 +29,34 @@
 #define MIN_GARRA 0
 
 char ssid[] = "ETRR Free";
-char pass[] = "";   
+char pass[] = "";
 
-    Servo baseServo;       
-    Servo hombroServo;
-    Servo codoServo;
-    Servo garraServo;
+// Servos
+Servo baseServo;
+Servo hombroServo;
+Servo codoServo;
+Servo garraServo;
+
+
+bool habilitacion = false;
 
 void setup() {
     Serial.begin(115200);
     Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
 
-    baseServo.attach(PIN_BASE);      
-    hombroServo.attach(PIN_HOMBRO);  
-    codoServo.attach(PIN_CODO);     
-    garraServo.attach(PIN_GARRA);    
+    baseServo.attach(PIN_BASE);
+    hombroServo.attach(PIN_HOMBRO);
+    codoServo.attach(PIN_CODO);
+    garraServo.attach(PIN_GARRA);
 
+  
     baseServo.write(INICIO_B);
-    hombroServo.write(INICIO_H);   
-    codoServo.write(INICIO_C);     
+    hombroServo.write(INICIO_H);
+    codoServo.write(INICIO_C);
     garraServo.write(INICIO_G);
+
+    delay(1500);  // tiempo para que el brazo llegue bien
+    habilitacion = true;  // ahora sí se habilita el control
 }
 
 void loop() {
@@ -56,31 +64,45 @@ void loop() {
 }
 
 
+BLYNK_CONNECTED() {
+    Blynk.virtualWrite(V0, INICIO_B);
+    Blynk.virtualWrite(V1, INICIO_H);
+    Blynk.virtualWrite(V2, INICIO_C);
+    Blynk.virtualWrite(V3, INICIO_G);
+}
+
+// BASE
 BLYNK_WRITE(V0) {
-    int angle = param.asInt();    
+    if (!habilitacion) return;
+
+    int angle = param.asInt();
     angle = constrain(angle, MIN_BASE, MAX_BASE);
     baseServo.write(angle);
 }
 
-
+// HOMBRO
 BLYNK_WRITE(V1) {
+    if (!habilitacion) return;
+
     int angle = param.asInt();
     angle = constrain(angle, MIN_HOMBRO, MAX_HOMBRO);
     hombroServo.write(angle);
 }
 
-
+// CODO
 BLYNK_WRITE(V2) {
+    if (!habilitacion) return;
+
     int angle = param.asInt();
     angle = constrain(angle, MIN_CODO, MAX_CODO);
     codoServo.write(angle);
 }
 
+// GARRA
+BLYNK_WRITE(V3) {
+    if (!habilitacion) return;
 
-BLYNK_WRITE(V3) 
-{
     int angle = param.asInt();
     angle = constrain(angle, MIN_GARRA, MAX_GARRA);
     garraServo.write(angle);
-
 }
